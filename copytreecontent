@@ -1,0 +1,29 @@
+cat << 'EOF' | bash
+#!/bin/bash
+
+# Check if xclip is installed
+if ! command -v xclip &> /dev/null
+then
+    echo "xclip is not installed. Please install it to copy to the clipboard."
+    exit 1
+fi
+
+# Create a temporary file for the tar output
+TEMP_TAR_FILE=$(mktemp)
+
+# Create the gzipped tar archive to temp file
+tar --exclude='.git' \
+    --exclude='node_modules' \
+    --exclude='__pycache__' \
+    --exclude='.venv' \
+    -czf "$TEMP_TAR_FILE" .
+
+# Copy the tar archive to the clipboard
+cat "$TEMP_TAR_FILE" | xclip -selection clipboard -in
+
+# Clean up the temporary file
+rm "$TEMP_TAR_FILE"
+
+echo "Tar archive copied to clipboard!"
+
+EOF
